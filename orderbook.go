@@ -8,35 +8,35 @@ import (
 // maximum limits per orderbook side to pre-allocate memory
 const MaxLimitsNum int = 10000
 
-type Orderbook struct {
-	Bids *redBlackBST
-	Asks *redBlackBST
+type Orderbook[P, V number] struct {
+	Bids *redBlackBST[P, V]
+	Asks *redBlackBST[P, V]
 
-	bidLimitsCache map[float64]*LimitOrder
-	askLimitsCache map[float64]*LimitOrder
+	bidLimitsCache map[P]*LimitOrder[P, V]
+	askLimitsCache map[P]*LimitOrder[P, V]
 	pool           *sync.Pool
 }
 
-func NewOrderbook() Orderbook {
-	bids := NewRedBlackBST()
-	asks := NewRedBlackBST()
-	return Orderbook{
+func NewOrderbook[P, V number]() Orderbook[P, V] {
+	bids := NewRedBlackBST[P, V]()
+	asks := NewRedBlackBST[P, V]()
+	return Orderbook[P, V]{
 		Bids: &bids,
 		Asks: &asks,
 
-		bidLimitsCache: make(map[float64]*LimitOrder, MaxLimitsNum),
-		askLimitsCache: make(map[float64]*LimitOrder, MaxLimitsNum),
+		bidLimitsCache: make(map[P]*LimitOrder[P, V], MaxLimitsNum),
+		askLimitsCache: make(map[P]*LimitOrder[P, V], MaxLimitsNum),
 		pool: &sync.Pool{
 			New: func() interface{} {
-				limit := NewLimitOrder(0.0)
+				limit := NewLimitOrder[P, V](0)
 				return &limit
 			},
 		},
 	}
 }
 
-func (this *Orderbook) Add(price float64, o *Order) {
-	var limit *LimitOrder
+func (this *Orderbook[P, V]) Add(price P, o *Order[P, V]) {
+	var limit *LimitOrder[P, V]
 
 	if o.BidOrAsk {
 		limit = this.bidLimitsCache[price]
@@ -46,7 +46,7 @@ func (this *Orderbook) Add(price float64, o *Order) {
 
 	if limit == nil {
 		// getting a new limit from pool
-		limit = this.pool.Get().(*LimitOrder)
+		limit = this.pool.Get().(*LimitOrder[P, V])
 		limit.Price = price
 
 		// insert into the corresponding BST and cache
@@ -63,7 +63,7 @@ func (this *Orderbook) Add(price float64, o *Order) {
 	limit.Enqueue(o)
 }
 
-func (this *Orderbook) Cancel(o *Order) {
+func (this *Orderbook[P, V]) Cancel(o *Order[P, V]) {
 	limit := o.Limit
 	limit.Delete(o)
 
@@ -82,16 +82,16 @@ func (this *Orderbook) Cancel(o *Order) {
 	}
 }
 
-func (this *Orderbook) ClearBidLimit(price float64) {
+func (this *Orderbook[P, V]) ClearBidLimit(price P) {
 	this.clearLimit(price, true)
 }
 
-func (this *Orderbook) ClearAskLimit(price float64) {
+func (this *Orderbook[P, V]) ClearAskLimit(price P) {
 	this.clearLimit(price, false)
 }
 
-func (this *Orderbook) clearLimit(price float64, bidOrAsk bool) {
-	var limit *LimitOrder
+func (this *Orderbook[P, V]) clearLimit(price P, bidOrAsk bool) {
+	var limit *LimitOrder[P, V]
 	if bidOrAsk {
 		limit = this.bidLimitsCache[price]
 	} else {
@@ -105,7 +105,7 @@ func (this *Orderbook) clearLimit(price float64, bidOrAsk bool) {
 	limit.Clear()
 }
 
-func (this *Orderbook) DeleteBidLimit(price float64) {
+func (this *Orderbook[P, V]) DeleteBidLimit(price P) {
 	limit := this.bidLimitsCache[price]
 	if limit == nil {
 		return
@@ -120,7 +120,7 @@ func (this *Orderbook) DeleteBidLimit(price float64) {
 
 }
 
-func (this *Orderbook) DeleteAskLimit(price float64) {
+func (this *Orderbook[P, V]) DeleteAskLimit(price P) {
 	limit := this.askLimitsCache[price]
 	if limit == nil {
 		return
@@ -134,7 +134,7 @@ func (this *Orderbook) DeleteAskLimit(price float64) {
 	this.pool.Put(limit)
 }
 
-func (this *Orderbook) deleteLimit(price float64, bidOrAsk bool) {
+func (this *Orderbook[P, V]) deleteLimit(price P, bidOrAsk bool) {
 	if bidOrAsk {
 		this.Bids.Delete(price)
 	} else {
@@ -142,34 +142,36 @@ func (this *Orderbook) deleteLimit(price float64, bidOrAsk bool) {
 	}
 }
 
-func (this *Orderbook) GetVolumeAtBidLimit(price float64) float64 {
+func (this *Orderbook[P, V]) GetVolumeAtBidLimit(price P) *V {
 	limit := this.bidLimitsCache[price]
 	if limit == nil {
-		return 0
+		return nil
 	}
-	return limit.TotalVolume()
+	v := limit.TotalVolume()
+	return &v
 }
 
-func (this *Orderbook) GetVolumeAtAskLimit(price float64) float64 {
+func (this *Orderbook[P, V]) GetVolumeAtAskLimit(price P) *V {
 	limit := this.askLimitsCache[price]
 	if limit == nil {
-		return 0
+		return nil
 	}
-	return limit.TotalVolume()
+	v := limit.TotalVolume()
+	return &v
 }
 
-func (this *Orderbook) GetBestBid() float64 {
+func (this *Orderbook[P, V]) GetBestBid() P {
 	return this.Bids.Max()
 }
 
-func (this *Orderbook) GetBestOffer() float64 {
+func (this *Orderbook[P, V]) GetBestOffer() P {
 	return this.Asks.Min()
 }
 
-func (this *Orderbook) BLength() int {
+func (this *Orderbook[P, V]) BLength() int {
 	return len(this.bidLimitsCache)
 }
 
-func (this *Orderbook) ALength() int {
+func (this *Orderbook[P, V]) ALength() int {
 	return len(this.askLimitsCache)
 }

@@ -1,26 +1,26 @@
 package hftorderbook
 
 // Mininum oriented Priority Queue
-type minPQ struct {
-	keys []float64
+type minPQ[P number] struct {
+	keys []P
 	n    int
 }
 
-func NewMinPQ(size int) minPQ {
-	return minPQ{
-		keys: make([]float64, size+1),
+func NewMinPQ[P number](size int) minPQ[P] {
+	return minPQ[P]{
+		keys: make([]P, size+1),
 	}
 }
 
-func (pq *minPQ) Size() int {
+func (pq *minPQ[P]) Size() int {
 	return pq.n
 }
 
-func (pq *minPQ) IsEmpty() bool {
+func (pq *minPQ[P]) IsEmpty() bool {
 	return pq.n == 0
 }
 
-func (pq *minPQ) Insert(key float64) {
+func (pq *minPQ[P]) Insert(key P) {
 	if pq.n+1 == cap(pq.keys) {
 		panic("pq is full")
 	}
@@ -32,7 +32,7 @@ func (pq *minPQ) Insert(key float64) {
 	pq.swim(pq.n)
 }
 
-func (pq *minPQ) Top() float64 {
+func (pq *minPQ[P]) Top() P {
 	if pq.IsEmpty() {
 		panic("pq is empty")
 	}
@@ -41,7 +41,7 @@ func (pq *minPQ) Top() float64 {
 }
 
 // removes minimal element and returns it
-func (pq *minPQ) DelTop() float64 {
+func (pq *minPQ[P]) DelTop() P {
 	if pq.IsEmpty() {
 		panic("pq is empty")
 	}
@@ -56,7 +56,7 @@ func (pq *minPQ) DelTop() float64 {
 	return top
 }
 
-func (pq *minPQ) swim(k int) {
+func (pq *minPQ[P]) swim(k int) {
 	for k > 1 && pq.keys[k] < pq.keys[k/2] {
 		// swap
 		pq.keys[k], pq.keys[k/2] = pq.keys[k/2], pq.keys[k]
@@ -64,7 +64,7 @@ func (pq *minPQ) swim(k int) {
 	}
 }
 
-func (pq *minPQ) sink(k int) {
+func (pq *minPQ[P]) sink(k int) {
 	for 2*k <= pq.n {
 		c := 2 * k
 		// select minimum of two children

@@ -1,30 +1,30 @@
 package hftorderbook
 
 // Indexed mininum oriented Priority Queue
-type indexMinPQ struct {
-	keys         []float64
+type indexMinPQ[P number] struct {
+	keys         []P
 	index2offset []int
 	offset2index []int
 	n            int
 }
 
-func NewIndexMinPQ(size int) indexMinPQ {
-	return indexMinPQ{
-		keys:         make([]float64, size+1),
+func NewIndexMinPQ[P number](size int) indexMinPQ[P] {
+	return indexMinPQ[P]{
+		keys:         make([]P, size+1),
 		index2offset: make([]int, size+1),
 		offset2index: make([]int, size+1),
 	}
 }
 
-func (pq *indexMinPQ) Size() int {
+func (pq *indexMinPQ[_]) Size() int {
 	return pq.n
 }
 
-func (pq *indexMinPQ) IsEmpty() bool {
+func (pq *indexMinPQ[_]) IsEmpty() bool {
 	return pq.n == 0
 }
 
-func (pq *indexMinPQ) Insert(i int, key float64) {
+func (pq *indexMinPQ[P]) Insert(i int, key P) {
 	pq.checkIndex(i)
 
 	if pq.index2offset[i] > 0 {
@@ -43,7 +43,7 @@ func (pq *indexMinPQ) Insert(i int, key float64) {
 	pq.swim(i)
 }
 
-func (pq *indexMinPQ) Change(i int, key float64) {
+func (pq *indexMinPQ[P]) Change(i int, key P) {
 	pq.checkIndex(i)
 
 	offset := pq.index2offset[i]
@@ -63,13 +63,13 @@ func (pq *indexMinPQ) Change(i int, key float64) {
 	}
 }
 
-func (pq *indexMinPQ) Contains(i int) bool {
+func (pq *indexMinPQ[P]) Contains(i int) bool {
 	pq.checkIndex(i)
 
 	return pq.index2offset[i] > 0
 }
 
-func (pq *indexMinPQ) Delete(i int) {
+func (pq *indexMinPQ[P]) Delete(i int) {
 	pq.checkIndex(i)
 
 	offset := pq.index2offset[i]
@@ -95,7 +95,7 @@ func (pq *indexMinPQ) Delete(i int) {
 	pq.sink(lastkeyindex)
 }
 
-func (pq *indexMinPQ) Top() float64 {
+func (pq *indexMinPQ[P]) Top() P {
 	if pq.IsEmpty() {
 		panic("pq is empty")
 	}
@@ -103,7 +103,7 @@ func (pq *indexMinPQ) Top() float64 {
 	return pq.keys[1]
 }
 
-func (pq *indexMinPQ) TopIndex() int {
+func (pq *indexMinPQ[P]) TopIndex() int {
 	if pq.IsEmpty() {
 		panic("pq is empty")
 	}
@@ -112,7 +112,7 @@ func (pq *indexMinPQ) TopIndex() int {
 }
 
 // removes minimal element and returns it's index
-func (pq *indexMinPQ) DelTop() int {
+func (pq *indexMinPQ[P]) DelTop() int {
 	minindex := pq.TopIndex()
 	pq.Delete(minindex)
 	return minindex
@@ -120,13 +120,13 @@ func (pq *indexMinPQ) DelTop() int {
 
 // helpers
 
-func (pq *indexMinPQ) checkIndex(i int) {
+func (pq *indexMinPQ[P]) checkIndex(i int) {
 	if i < 0 || i+1 >= cap(pq.keys) {
 		panic("invalid index")
 	}
 }
 
-func (pq *indexMinPQ) swim(i int) {
+func (pq *indexMinPQ[P]) swim(i int) {
 	k := pq.index2offset[i]
 	for k > 1 && pq.keys[k] < pq.keys[k/2] {
 		// swap keys
@@ -142,7 +142,7 @@ func (pq *indexMinPQ) swim(i int) {
 	}
 }
 
-func (pq *indexMinPQ) sink(i int) {
+func (pq *indexMinPQ[P]) sink(i int) {
 	k := pq.index2offset[i]
 	for 2*k <= pq.n {
 		c := 2 * k

@@ -8,33 +8,33 @@ import (
 // search, put, delete, min, max, select, rank, floor, ceiling operations.
 // Average runtine for search-based operations estimated as 1*lgN
 
-type nodeRedBlack struct {
-	Key   float64
-	Value *LimitOrder
-	Next  *nodeRedBlack
-	Prev  *nodeRedBlack
+type nodeRedBlack[P, V number] struct {
+	Key   P
+	Value *LimitOrder[P, V]
+	Next  *nodeRedBlack[P, V]
+	Prev  *nodeRedBlack[P, V]
 
-	left  *nodeRedBlack
-	right *nodeRedBlack
+	left  *nodeRedBlack[P, V]
+	right *nodeRedBlack[P, V]
 	size  int
 	isRed bool
 }
 
-type redBlackBST struct {
-	root *nodeRedBlack
-	minC *nodeRedBlack // cached min/max keys for O(1) access
-	maxC *nodeRedBlack
+type redBlackBST[P, V number] struct {
+	root *nodeRedBlack[P, V]
+	minC *nodeRedBlack[P, V] // cached min/max keys for O(1) access
+	maxC *nodeRedBlack[P, V]
 }
 
-func NewRedBlackBST() redBlackBST {
-	return redBlackBST{}
+func NewRedBlackBST[P, V number]() redBlackBST[P, V] {
+	return redBlackBST[P, V]{}
 }
 
-func (t *redBlackBST) Size() int {
+func (t *redBlackBST[_, _]) Size() int {
 	return t.size(t.root)
 }
 
-func (t *redBlackBST) size(n *nodeRedBlack) int {
+func (t *redBlackBST[P, V]) size(n *nodeRedBlack[P, V]) int {
 	if n == nil {
 		return 0
 	}
@@ -42,21 +42,21 @@ func (t *redBlackBST) size(n *nodeRedBlack) int {
 	return n.size
 }
 
-func (t *redBlackBST) IsEmpty() bool {
+func (t *redBlackBST[_, _]) IsEmpty() bool {
 	return t.size(t.root) == 0
 }
 
-func (t *redBlackBST) panicIfEmpty() {
+func (t *redBlackBST[_, _]) panicIfEmpty() {
 	if t.IsEmpty() {
 		panic("Red Black BST is empty")
 	}
 }
 
-func (t *redBlackBST) Contains(key float64) bool {
+func (t *redBlackBST[P, _]) Contains(key P) bool {
 	return t.get(t.root, key) != nil
 }
 
-func (t *redBlackBST) Get(key float64) *LimitOrder {
+func (t *redBlackBST[P, V]) Get(key P) *LimitOrder[P, V] {
 	t.panicIfEmpty()
 
 	x := t.get(t.root, key)
@@ -67,7 +67,7 @@ func (t *redBlackBST) Get(key float64) *LimitOrder {
 	return x.Value
 }
 
-func (t *redBlackBST) get(n *nodeRedBlack, key float64) *nodeRedBlack {
+func (t *redBlackBST[P, V]) get(n *nodeRedBlack[P, V], key P) *nodeRedBlack[P, V] {
 	if n == nil {
 		return nil
 	}
@@ -83,7 +83,7 @@ func (t *redBlackBST) get(n *nodeRedBlack, key float64) *nodeRedBlack {
 	}
 }
 
-func (t *redBlackBST) isRed(n *nodeRedBlack) bool {
+func (t *redBlackBST[P, V]) isRed(n *nodeRedBlack[P, V]) bool {
 	if n == nil {
 		// nil nodes are black by default
 		return false
@@ -92,7 +92,7 @@ func (t *redBlackBST) isRed(n *nodeRedBlack) bool {
 	return n.isRed
 }
 
-func (t *redBlackBST) flipColors(n *nodeRedBlack) {
+func (t *redBlackBST[P, V]) flipColors(n *nodeRedBlack[P, V]) {
 	if n == nil {
 		return
 	}
@@ -109,7 +109,7 @@ func (t *redBlackBST) flipColors(n *nodeRedBlack) {
 	n.isRed = !n.isRed
 }
 
-func (t *redBlackBST) rotateLeft(n *nodeRedBlack) *nodeRedBlack {
+func (t *redBlackBST[P, V]) rotateLeft(n *nodeRedBlack[P, V]) *nodeRedBlack[P, V] {
 	x := n.right
 	n.right = x.left
 	x.left = n
@@ -124,7 +124,7 @@ func (t *redBlackBST) rotateLeft(n *nodeRedBlack) *nodeRedBlack {
 	return x
 }
 
-func (t *redBlackBST) rotateRight(n *nodeRedBlack) *nodeRedBlack {
+func (t *redBlackBST[P, V]) rotateRight(n *nodeRedBlack[P, V]) *nodeRedBlack[P, V] {
 	x := n.left
 	n.left = x.right
 	x.right = n
@@ -139,17 +139,17 @@ func (t *redBlackBST) rotateRight(n *nodeRedBlack) *nodeRedBlack {
 	return x
 }
 
-func (t *redBlackBST) Put(key float64, value *LimitOrder) {
+func (t *redBlackBST[P, V]) Put(key P, value *LimitOrder[P, V]) {
 	t.root = t.put(t.root, key, value)
 
 	// keeping root black
 	t.root.isRed = false
 }
 
-func (t *redBlackBST) put(n *nodeRedBlack, key float64, value *LimitOrder) *nodeRedBlack {
+func (t *redBlackBST[P, V]) put(n *nodeRedBlack[P, V], key P, value *LimitOrder[P, V]) *nodeRedBlack[P, V] {
 	if n == nil {
 		// search miss, creating a new node with a red link as a part of 3- or 4-node
-		n := &nodeRedBlack{
+		n := &nodeRedBlack[P, V]{
 			Value: value,
 			Key:   key,
 			size:  1,
@@ -222,7 +222,7 @@ func (t *redBlackBST) put(n *nodeRedBlack, key float64, value *LimitOrder) *node
 	return n
 }
 
-func (t *redBlackBST) Height() int {
+func (t *redBlackBST[_, _]) Height() int {
 	if t.IsEmpty() {
 		return 0
 	}
@@ -230,7 +230,7 @@ func (t *redBlackBST) Height() int {
 	return t.height(t.root)
 }
 
-func (t *redBlackBST) height(n *nodeRedBlack) int {
+func (t *redBlackBST[P, V]) height(n *nodeRedBlack[P, V]) int {
 	if n == nil {
 		return 0
 	}
@@ -246,12 +246,12 @@ func (t *redBlackBST) height(n *nodeRedBlack) int {
 	return height + 1
 }
 
-func (t *redBlackBST) IsRedBlack() bool {
+func (t *redBlackBST[P, V]) IsRedBlack() bool {
 	balanced, _ := t.isBalanced(t.root)
 	return balanced && t.is23(t.root)
 }
 
-func (t *redBlackBST) isBalanced(n *nodeRedBlack) (bool, int) {
+func (t *redBlackBST[P, V]) isBalanced(n *nodeRedBlack[P, V]) (bool, int) {
 	if n == nil {
 		// nil node is black by default
 		return true, 1
@@ -272,7 +272,7 @@ func (t *redBlackBST) isBalanced(n *nodeRedBlack) (bool, int) {
 	return lb && rb && l == r, b
 }
 
-func (t *redBlackBST) is23(n *nodeRedBlack) bool {
+func (t *redBlackBST[P, V]) is23(n *nodeRedBlack[P, V]) bool {
 	if n == nil {
 		return true
 	}
@@ -290,22 +290,22 @@ func (t *redBlackBST) is23(n *nodeRedBlack) bool {
 	return t.is23(n.left) && t.is23(n.right)
 }
 
-func (t *redBlackBST) Min() float64 {
+func (t *redBlackBST[P, V]) Min() P {
 	t.panicIfEmpty()
 	return t.minC.Key
 }
 
-func (t *redBlackBST) MinValue() *LimitOrder {
+func (t *redBlackBST[P, V]) MinValue() *LimitOrder[P, V] {
 	t.panicIfEmpty()
 	return t.minC.Value
 }
 
-func (t *redBlackBST) MinPointer() *nodeRedBlack {
+func (t *redBlackBST[P, V]) MinPointer() *nodeRedBlack[P, V] {
 	t.panicIfEmpty()
 	return t.minC
 }
 
-func (t *redBlackBST) min(n *nodeRedBlack) *nodeRedBlack {
+func (t *redBlackBST[P, V]) min(n *nodeRedBlack[P, V]) *nodeRedBlack[P, V] {
 	if n.left == nil {
 		return n
 	}
@@ -313,22 +313,22 @@ func (t *redBlackBST) min(n *nodeRedBlack) *nodeRedBlack {
 	return t.min(n.left)
 }
 
-func (t *redBlackBST) Max() float64 {
+func (t *redBlackBST[P, V]) Max() P {
 	t.panicIfEmpty()
 	return t.maxC.Key
 }
 
-func (t *redBlackBST) MaxValue() *LimitOrder {
+func (t *redBlackBST[P, V]) MaxValue() *LimitOrder[P, V] {
 	t.panicIfEmpty()
 	return t.maxC.Value
 }
 
-func (t *redBlackBST) MaxPointer() *nodeRedBlack {
+func (t *redBlackBST[P, V]) MaxPointer() *nodeRedBlack[P, V] {
 	t.panicIfEmpty()
 	return t.maxC
 }
 
-func (t *redBlackBST) max(n *nodeRedBlack) *nodeRedBlack {
+func (t *redBlackBST[P, V]) max(n *nodeRedBlack[P, V]) *nodeRedBlack[P, V] {
 	if n.right == nil {
 		return n
 	}
@@ -336,7 +336,7 @@ func (t *redBlackBST) max(n *nodeRedBlack) *nodeRedBlack {
 	return t.max(n.right)
 }
 
-func (t *redBlackBST) Floor(key float64) float64 {
+func (t *redBlackBST[P, V]) Floor(key P) P {
 	t.panicIfEmpty()
 
 	floor := t.floor(t.root, key)
@@ -347,7 +347,7 @@ func (t *redBlackBST) Floor(key float64) float64 {
 	return floor.Key
 }
 
-func (t *redBlackBST) floor(n *nodeRedBlack, key float64) *nodeRedBlack {
+func (t *redBlackBST[P, V]) floor(n *nodeRedBlack[P, V], key P) *nodeRedBlack[P, V] {
 	if n == nil {
 		// search miss
 		return nil
@@ -372,7 +372,7 @@ func (t *redBlackBST) floor(n *nodeRedBlack, key float64) *nodeRedBlack {
 	return n
 }
 
-func (t *redBlackBST) Ceiling(key float64) float64 {
+func (t *redBlackBST[P, V]) Ceiling(key P) P {
 	t.panicIfEmpty()
 
 	ceiling := t.ceiling(t.root, key)
@@ -383,7 +383,7 @@ func (t *redBlackBST) Ceiling(key float64) float64 {
 	return ceiling.Key
 }
 
-func (t *redBlackBST) ceiling(n *nodeRedBlack, key float64) *nodeRedBlack {
+func (t *redBlackBST[P, V]) ceiling(n *nodeRedBlack[P, V], key P) *nodeRedBlack[P, V] {
 	if n == nil {
 		// search miss
 		return nil
@@ -408,7 +408,7 @@ func (t *redBlackBST) ceiling(n *nodeRedBlack, key float64) *nodeRedBlack {
 	return n
 }
 
-func (t *redBlackBST) Select(k int) float64 {
+func (t *redBlackBST[P, V]) Select(k int) P {
 	if k < 0 || k >= t.Size() {
 		panic("index out of range")
 	}
@@ -416,7 +416,7 @@ func (t *redBlackBST) Select(k int) float64 {
 	return t.selectNode(t.root, k).Key
 }
 
-func (t *redBlackBST) selectNode(n *nodeRedBlack, k int) *nodeRedBlack {
+func (t *redBlackBST[P, V]) selectNode(n *nodeRedBlack[P, V], k int) *nodeRedBlack[P, V] {
 	if t.size(n.left) == k {
 		return n
 	}
@@ -429,12 +429,12 @@ func (t *redBlackBST) selectNode(n *nodeRedBlack, k int) *nodeRedBlack {
 	return t.selectNode(n.right, k)
 }
 
-func (t *redBlackBST) Rank(key float64) int {
+func (t *redBlackBST[P, V]) Rank(key P) int {
 	t.panicIfEmpty()
 	return t.rank(t.root, key)
 }
 
-func (t *redBlackBST) rank(n *nodeRedBlack, key float64) int {
+func (t *redBlackBST[P, V]) rank(n *nodeRedBlack[P, V], key P) int {
 	if n == nil {
 		return 0
 	}
@@ -450,7 +450,7 @@ func (t *redBlackBST) rank(n *nodeRedBlack, key float64) int {
 	return t.size(n.left) + 1 + t.rank(n.right, key)
 }
 
-func (t *redBlackBST) moveRedLeft(n *nodeRedBlack) *nodeRedBlack {
+func (t *redBlackBST[P, V]) moveRedLeft(n *nodeRedBlack[P, V]) *nodeRedBlack[P, V] {
 	// assuming that n.left and n.left.left are black and n is red,
 	// make h.left or one of its children red
 	t.flipColors(n)
@@ -470,7 +470,7 @@ func (t *redBlackBST) moveRedLeft(n *nodeRedBlack) *nodeRedBlack {
 	return n
 }
 
-func (t *redBlackBST) DeleteMin() {
+func (t *redBlackBST[P, V]) DeleteMin() {
 	t.panicIfEmpty()
 
 	if !t.isRed(t.root.left) && !t.isRed(t.root.right) {
@@ -483,7 +483,7 @@ func (t *redBlackBST) DeleteMin() {
 	}
 }
 
-func (t *redBlackBST) deleteMin(n *nodeRedBlack) *nodeRedBlack {
+func (t *redBlackBST[P, V]) deleteMin(n *nodeRedBlack[P, V]) *nodeRedBlack[P, V] {
 	if n.left == nil {
 		// we've reached the least leave of the tree
 		next := n.Next
@@ -527,7 +527,7 @@ func (t *redBlackBST) deleteMin(n *nodeRedBlack) *nodeRedBlack {
 	return n
 }
 
-func (t *redBlackBST) moveRedRight(n *nodeRedBlack) *nodeRedBlack {
+func (t *redBlackBST[P, V]) moveRedRight(n *nodeRedBlack[P, V]) *nodeRedBlack[P, V] {
 	// assuming n is red, n.right and n.right.left are black,
 	// make h.right or one of its children red
 	t.flipColors(n)
@@ -544,7 +544,7 @@ func (t *redBlackBST) moveRedRight(n *nodeRedBlack) *nodeRedBlack {
 	return n
 }
 
-func (t *redBlackBST) DeleteMax() {
+func (t *redBlackBST[P, V]) DeleteMax() {
 	t.panicIfEmpty()
 
 	if !t.isRed(t.root.left) && !t.isRed(t.root.right) {
@@ -556,7 +556,7 @@ func (t *redBlackBST) DeleteMax() {
 	}
 }
 
-func (t *redBlackBST) deleteMax(n *nodeRedBlack) *nodeRedBlack {
+func (t *redBlackBST[P, V]) deleteMax(n *nodeRedBlack[P, V]) *nodeRedBlack[P, V] {
 	if t.isRed(n.left) {
 		// making right red by rotating
 		n = t.rotateRight(n)
@@ -604,7 +604,7 @@ func (t *redBlackBST) deleteMax(n *nodeRedBlack) *nodeRedBlack {
 	return n
 }
 
-func (t *redBlackBST) Delete(key float64) {
+func (t *redBlackBST[P, V]) Delete(key P) {
 	t.panicIfEmpty()
 
 	if !t.isRed(t.root.left) && !t.isRed(t.root.right) {
@@ -616,7 +616,7 @@ func (t *redBlackBST) Delete(key float64) {
 	}
 }
 
-func (t *redBlackBST) delete(n *nodeRedBlack, key float64) *nodeRedBlack {
+func (t *redBlackBST[P, V]) delete(n *nodeRedBlack[P, V], key P) *nodeRedBlack[P, V] {
 	if n.Key > key {
 		if n.left == nil {
 			// search miss
@@ -699,7 +699,7 @@ func (t *redBlackBST) delete(n *nodeRedBlack, key float64) *nodeRedBlack {
 	return n
 }
 
-func (t *redBlackBST) Keys(lo, hi float64) []float64 {
+func (t *redBlackBST[P, V]) Keys(lo, hi P) []P {
 	if lo < t.Min() || hi > t.Max() {
 		panic("keys out of range")
 	}
@@ -707,7 +707,7 @@ func (t *redBlackBST) Keys(lo, hi float64) []float64 {
 	return t.keys(t.root, lo, hi)
 }
 
-func (t *redBlackBST) keys(n *nodeRedBlack, lo, hi float64) []float64 {
+func (t *redBlackBST[P, V]) keys(n *nodeRedBlack[P, V], lo, hi P) []P {
 	if n == nil {
 		return nil
 	}
@@ -721,7 +721,7 @@ func (t *redBlackBST) keys(n *nodeRedBlack, lo, hi float64) []float64 {
 	l := t.keys(n.left, lo, hi)
 	r := t.keys(n.right, lo, hi)
 
-	keys := make([]float64, 0)
+	keys := make([]P, 0)
 	if l != nil {
 		keys = append(keys, l...)
 	}
@@ -733,13 +733,13 @@ func (t *redBlackBST) keys(n *nodeRedBlack, lo, hi float64) []float64 {
 	return keys
 }
 
-func (t *redBlackBST) Print() {
+func (t *redBlackBST[P, V]) Print() {
 	fmt.Println()
 	t.print(t.root)
 	fmt.Println()
 }
 
-func (t *redBlackBST) print(n *nodeRedBlack) {
+func (t *redBlackBST[P, V]) print(n *nodeRedBlack[P, V]) {
 	if n == nil {
 		return
 	}

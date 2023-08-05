@@ -2,25 +2,25 @@ package hftorderbook
 
 // Doubly linked orders queue
 // TODO: this should be compared with ring buffer queue performance
-type ordersQueue struct {
-	head *Order
-	tail *Order
+type ordersQueue[P, V number] struct {
+	head *Order[P, V]
+	tail *Order[P, V]
 	size int
 }
 
-func NewOrdersQueue() ordersQueue {
-	return ordersQueue{}
+func NewOrdersQueue[P, V number]() ordersQueue[P, V] {
+	return ordersQueue[P, V]{}
 }
 
-func (this *ordersQueue) Size() int {
+func (this *ordersQueue[_, _]) Size() int {
 	return this.size
 }
 
-func (this *ordersQueue) IsEmpty() bool {
+func (this *ordersQueue[_, _]) IsEmpty() bool {
 	return this.size == 0
 }
 
-func (this *ordersQueue) Enqueue(o *Order) {
+func (this *ordersQueue[P, V]) Enqueue(o *Order[P, V]) {
 	tail := this.tail
 	this.tail = o
 	if tail != nil {
@@ -33,7 +33,7 @@ func (this *ordersQueue) Enqueue(o *Order) {
 	this.size++
 }
 
-func (this *ordersQueue) Dequeue() *Order {
+func (this *ordersQueue[P, V]) Dequeue() *Order[P, V] {
 	if this.size == 0 {
 		return nil
 	}
@@ -48,7 +48,7 @@ func (this *ordersQueue) Dequeue() *Order {
 	return head
 }
 
-func (this *ordersQueue) Delete(o *Order) {
+func (this *ordersQueue[P, V]) Delete(o *Order[P, V]) {
 	prev := o.Prev
 	next := o.Next
 	if prev != nil {

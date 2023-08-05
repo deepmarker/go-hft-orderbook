@@ -6,32 +6,32 @@ import (
 
 // Simple Binary Search Tree, not self-balancing, good for random input
 
-type nodeBST struct {
-	Key   float64
-	Value *LimitOrder
-	Next  *nodeBST
-	Prev  *nodeBST
+type nodeBST[P, V number] struct {
+	Key   P
+	Value *LimitOrder[P, V]
+	Next  *nodeBST[P, V]
+	Prev  *nodeBST[P, V]
 
-	left  *nodeBST
-	right *nodeBST
+	left  *nodeBST[P, V]
+	right *nodeBST[P, V]
 	size  int
 }
 
-type bst struct {
-	root *nodeBST
-	minC *nodeBST // cached min/max keys for O(1) access
-	maxC *nodeBST
+type bst[P, V number] struct {
+	root *nodeBST[P, V]
+	minC *nodeBST[P, V] // cached min/max keys for O(1) access
+	maxC *nodeBST[P, V]
 }
 
-func NewBST() bst {
-	return bst{}
+func NewBST[P, V number]() bst[P, V] {
+	return bst[P, V]{}
 }
 
-func (t *bst) Size() int {
+func (t *bst[_, _]) Size() int {
 	return t.size(t.root)
 }
 
-func (t *bst) size(n *nodeBST) int {
+func (t *bst[P, V]) size(n *nodeBST[P, V]) int {
 	if n == nil {
 		return 0
 	}
@@ -39,21 +39,21 @@ func (t *bst) size(n *nodeBST) int {
 	return n.size
 }
 
-func (t *bst) IsEmpty() bool {
+func (t *bst[_, _]) IsEmpty() bool {
 	return t.size(t.root) == 0
 }
 
-func (t *bst) panicIfEmpty() {
+func (t *bst[_, _]) panicIfEmpty() {
 	if t.IsEmpty() {
 		panic("BST is empty")
 	}
 }
 
-func (t *bst) Contains(key float64) bool {
+func (t *bst[P, _]) Contains(key P) bool {
 	return t.get(t.root, key) != nil
 }
 
-func (t *bst) Get(key float64) *LimitOrder {
+func (t *bst[P, V]) Get(key P) *LimitOrder[P, V] {
 	t.panicIfEmpty()
 
 	x := t.get(t.root, key)
@@ -64,7 +64,7 @@ func (t *bst) Get(key float64) *LimitOrder {
 	return x.Value
 }
 
-func (t *bst) get(n *nodeBST, key float64) *nodeBST {
+func (t *bst[P, V]) get(n *nodeBST[P, V], key P) *nodeBST[P, V] {
 	if n == nil {
 		return nil
 	}
@@ -80,14 +80,14 @@ func (t *bst) get(n *nodeBST, key float64) *nodeBST {
 	}
 }
 
-func (t *bst) Put(key float64, value *LimitOrder) {
+func (t *bst[P, V]) Put(key P, value *LimitOrder[P, V]) {
 	t.root = t.put(t.root, key, value)
 }
 
-func (t *bst) put(n *nodeBST, key float64, value *LimitOrder) *nodeBST {
+func (t *bst[P, V]) put(n *nodeBST[P, V], key P, value *LimitOrder[P, V]) *nodeBST[P, V] {
 	if n == nil {
 		// search miss, creating a new node
-		n := &nodeBST{
+		n := &nodeBST[P, V]{
 			Value: value,
 			Key:   key,
 			size:  1,
@@ -144,7 +144,7 @@ func (t *bst) put(n *nodeBST, key float64, value *LimitOrder) *nodeBST {
 	return n
 }
 
-func (t *bst) Height() int {
+func (t *bst[P, V]) Height() int {
 	if t.IsEmpty() {
 		return 0
 	}
@@ -152,7 +152,7 @@ func (t *bst) Height() int {
 	return t.height(t.root)
 }
 
-func (t *bst) height(n *nodeBST) int {
+func (t *bst[P, V]) height(n *nodeBST[P, V]) int {
 	if n == nil {
 		return 0
 	}
@@ -168,22 +168,22 @@ func (t *bst) height(n *nodeBST) int {
 	return height + 1
 }
 
-func (t *bst) Min() float64 {
+func (t *bst[P, V]) Min() P {
 	t.panicIfEmpty()
 	return t.minC.Key
 }
 
-func (t *bst) MinValue() *LimitOrder {
+func (t *bst[P, V]) MinValue() *LimitOrder[P, V] {
 	t.panicIfEmpty()
 	return t.minC.Value
 }
 
-func (t *bst) MinPointer() *nodeBST {
+func (t *bst[P, V]) MinPointer() *nodeBST[P, V] {
 	t.panicIfEmpty()
 	return t.minC
 }
 
-func (t *bst) min(n *nodeBST) *nodeBST {
+func (t *bst[P, V]) min(n *nodeBST[P, V]) *nodeBST[P, V] {
 	if n.left == nil {
 		return n
 	}
@@ -191,22 +191,22 @@ func (t *bst) min(n *nodeBST) *nodeBST {
 	return t.min(n.left)
 }
 
-func (t *bst) Max() float64 {
+func (t *bst[P, V]) Max() P {
 	t.panicIfEmpty()
 	return t.maxC.Key
 }
 
-func (t *bst) MaxValue() *LimitOrder {
+func (t *bst[P, V]) MaxValue() *LimitOrder[P, V] {
 	t.panicIfEmpty()
 	return t.maxC.Value
 }
 
-func (t *bst) MaxPointer() *nodeBST {
+func (t *bst[P, V]) MaxPointer() *nodeBST[P, V] {
 	t.panicIfEmpty()
 	return t.maxC
 }
 
-func (t *bst) max(n *nodeBST) *nodeBST {
+func (t *bst[P, V]) max(n *nodeBST[P, V]) *nodeBST[P, V] {
 	if n.right == nil {
 		return n
 	}
@@ -214,7 +214,7 @@ func (t *bst) max(n *nodeBST) *nodeBST {
 	return t.max(n.right)
 }
 
-func (t *bst) Floor(key float64) float64 {
+func (t *bst[P, V]) Floor(key P) P {
 	t.panicIfEmpty()
 
 	floor := t.floor(t.root, key)
@@ -225,7 +225,7 @@ func (t *bst) Floor(key float64) float64 {
 	return floor.Key
 }
 
-func (t *bst) floor(n *nodeBST, key float64) *nodeBST {
+func (t *bst[P, V]) floor(n *nodeBST[P, V], key P) *nodeBST[P, V] {
 	if n == nil {
 		// search miss
 		return nil
@@ -250,7 +250,7 @@ func (t *bst) floor(n *nodeBST, key float64) *nodeBST {
 	return n
 }
 
-func (t *bst) Ceiling(key float64) float64 {
+func (t *bst[P, V]) Ceiling(key P) P {
 	t.panicIfEmpty()
 
 	ceiling := t.ceiling(t.root, key)
@@ -261,7 +261,7 @@ func (t *bst) Ceiling(key float64) float64 {
 	return ceiling.Key
 }
 
-func (t *bst) ceiling(n *nodeBST, key float64) *nodeBST {
+func (t *bst[P, V]) ceiling(n *nodeBST[P, V], key P) *nodeBST[P, V] {
 	if n == nil {
 		// search miss
 		return nil
@@ -286,7 +286,7 @@ func (t *bst) ceiling(n *nodeBST, key float64) *nodeBST {
 	return n
 }
 
-func (t *bst) Select(k int) float64 {
+func (t *bst[P, V]) Select(k int) P {
 	if k < 0 || k >= t.Size() {
 		panic("index out of range")
 	}
@@ -294,7 +294,7 @@ func (t *bst) Select(k int) float64 {
 	return t.selectNode(t.root, k).Key
 }
 
-func (t *bst) selectNode(n *nodeBST, k int) *nodeBST {
+func (t *bst[P, V]) selectNode(n *nodeBST[P, V], k int) *nodeBST[P, V] {
 	if t.size(n.left) == k {
 		return n
 	}
@@ -307,12 +307,12 @@ func (t *bst) selectNode(n *nodeBST, k int) *nodeBST {
 	return t.selectNode(n.right, k)
 }
 
-func (t *bst) Rank(key float64) int {
+func (t *bst[P, V]) Rank(key P) int {
 	t.panicIfEmpty()
 	return t.rank(t.root, key)
 }
 
-func (t *bst) rank(n *nodeBST, key float64) int {
+func (t *bst[P, V]) rank(n *nodeBST[P, V], key P) int {
 	if n == nil {
 		return 0
 	}
@@ -328,7 +328,7 @@ func (t *bst) rank(n *nodeBST, key float64) int {
 	return t.size(n.left) + 1 + t.rank(n.right, key)
 }
 
-func (t *bst) deleteMin(n *nodeBST) *nodeBST {
+func (t *bst[P, V]) deleteMin(n *nodeBST[P, V]) *nodeBST[P, V] {
 	if n == nil {
 		return nil
 	}
@@ -361,13 +361,13 @@ func (t *bst) deleteMin(n *nodeBST) *nodeBST {
 	return n
 }
 
-func (t *bst) Delete(key float64) {
+func (t *bst[P, V]) Delete(key P) {
 	t.panicIfEmpty()
 
 	t.root = t.delete(t.root, key)
 }
 
-func (t *bst) delete(n *nodeBST, key float64) *nodeBST {
+func (t *bst[P, V]) delete(n *nodeBST[P, V], key P) *nodeBST[P, V] {
 	if n == nil {
 		return nil
 	}
@@ -416,7 +416,7 @@ func (t *bst) delete(n *nodeBST, key float64) *nodeBST {
 	return n
 }
 
-func (t *bst) Keys(lo, hi float64) []float64 {
+func (t *bst[P, V]) Keys(lo, hi P) []P {
 	if lo < t.Min() || hi > t.Max() {
 		panic("keys out of range")
 	}
@@ -424,7 +424,7 @@ func (t *bst) Keys(lo, hi float64) []float64 {
 	return t.keys(t.root, lo, hi)
 }
 
-func (t *bst) keys(n *nodeBST, lo, hi float64) []float64 {
+func (t *bst[P, V]) keys(n *nodeBST[P, V], lo, hi P) []P {
 	if n == nil {
 		return nil
 	}
@@ -438,7 +438,7 @@ func (t *bst) keys(n *nodeBST, lo, hi float64) []float64 {
 	l := t.keys(n.left, lo, hi)
 	r := t.keys(n.right, lo, hi)
 
-	keys := make([]float64, 0)
+	keys := make([]P, 0)
 	if l != nil {
 		keys = append(keys, l...)
 	}
@@ -450,13 +450,13 @@ func (t *bst) keys(n *nodeBST, lo, hi float64) []float64 {
 	return keys
 }
 
-func (t *bst) Print() {
+func (t *bst[P, V]) Print() {
 	fmt.Println()
 	t.print(t.root)
 	fmt.Println()
 }
 
-func (t *bst) print(n *nodeBST) {
+func (t *bst[P, V]) print(n *nodeBST[P, V]) {
 	if n == nil {
 		return
 	}
