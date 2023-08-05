@@ -3,12 +3,12 @@ package hftorderbook
 // Mininum oriented Priority Queue
 type minPQ struct {
 	keys []float64
-	n int
+	n    int
 }
 
 func NewMinPQ(size int) minPQ {
-	return minPQ {
-		keys: make([]float64, size + 1),
+	return minPQ{
+		keys: make([]float64, size+1),
 	}
 }
 
@@ -21,7 +21,7 @@ func (pq *minPQ) IsEmpty() bool {
 }
 
 func (pq *minPQ) Insert(key float64) {
-	if pq.n + 1 == cap(pq.keys) {
+	if pq.n+1 == cap(pq.keys) {
 		panic("pq is full")
 	}
 
@@ -60,13 +60,13 @@ func (pq *minPQ) swim(k int) {
 	for k > 1 && pq.keys[k] < pq.keys[k/2] {
 		// swap
 		pq.keys[k], pq.keys[k/2] = pq.keys[k/2], pq.keys[k]
-		k = k/2
+		k = k / 2
 	}
 }
 
 func (pq *minPQ) sink(k int) {
 	for 2*k <= pq.n {
-		c := 2*k
+		c := 2 * k
 		// select minimum of two children
 		if c < pq.n && pq.keys[c+1] < pq.keys[c] {
 			c++

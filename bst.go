@@ -7,14 +7,14 @@ import (
 // Simple Binary Search Tree, not self-balancing, good for random input
 
 type nodeBST struct {
-	Key float64
+	Key   float64
 	Value *LimitOrder
-	Next *nodeBST
-	Prev *nodeBST
-	
-	left *nodeBST
+	Next  *nodeBST
+	Prev  *nodeBST
+
+	left  *nodeBST
 	right *nodeBST
-	size int
+	size  int
 }
 
 type bst struct {
@@ -89,8 +89,8 @@ func (t *bst) put(n *nodeBST, key float64, value *LimitOrder) *nodeBST {
 		// search miss, creating a new node
 		n := &nodeBST{
 			Value: value,
-			Key: key,
-			size: 1,
+			Key:   key,
+			size:  1,
 		}
 
 		if t.minC == nil || key < t.minC.Key {
@@ -118,7 +118,7 @@ func (t *bst) put(n *nodeBST, key float64, value *LimitOrder) *nodeBST {
 			// new node has been just inserted to the left
 			prev := n.Prev
 			if prev != nil {
-				prev.Next = n.left	
+				prev.Next = n.left
 			}
 			n.left.Prev = prev
 			n.left.Next = n
@@ -159,7 +159,7 @@ func (t *bst) height(n *nodeBST) int {
 
 	lheight := t.height(n.left)
 	rheight := t.height(n.right)
-	
+
 	height := lheight
 	if rheight > lheight {
 		height = rheight
@@ -407,7 +407,7 @@ func (t *bst) delete(n *nodeBST, key float64) *nodeBST {
 		newn.left = n.left
 		n = newn
 	} else if n.Key > key {
-		n.left = t.delete(n.left, key)	
+		n.left = t.delete(n.left, key)
 	} else {
 		n.right = t.delete(n.right, key)
 	}
@@ -437,7 +437,7 @@ func (t *bst) keys(n *nodeBST, lo, hi float64) []float64 {
 
 	l := t.keys(n.left, lo, hi)
 	r := t.keys(n.right, lo, hi)
-	
+
 	keys := make([]float64, 0)
 	if l != nil {
 		keys = append(keys, l...)

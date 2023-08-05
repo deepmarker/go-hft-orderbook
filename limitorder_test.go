@@ -17,9 +17,9 @@ func TestLimitOrderAddOrder(t *testing.T) {
 	price := 3.141593
 	volume := 25.0
 	l := NewLimitOrder(price)
-	o := &Order{ Volume: volume }
+	o := &Order{Volume: volume}
 	l.Enqueue(o)
-	
+
 	if l.TotalVolume() != volume {
 		t.Errorf("total volume counted incorrectly")
 	}
@@ -37,7 +37,7 @@ func TestLimitOrderAddMultipleOrders(t *testing.T) {
 	l := NewLimitOrder(price)
 	n := 100
 	for i := 0; i < n; i += 1 {
-		o := &Order{ Id: i, Volume: rand.Float64() }
+		o := &Order{Id: i, Volume: rand.Float64()}
 		volume += o.Volume
 		l.Enqueue(o)
 	}
@@ -51,10 +51,10 @@ func TestLimitOrderAddMultipleOrders(t *testing.T) {
 	}
 
 	o := l.Dequeue()
-	if l.TotalVolume() != volume - o.Volume {
+	if l.TotalVolume() != volume-o.Volume {
 		t.Errorf("total volume calculated incorrectly")
 	}
-	if l.Size() != n - 1 {
+	if l.Size() != n-1 {
 		t.Errorf("total count calculated incorrectly")
 	}
 }

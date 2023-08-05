@@ -1,8 +1,8 @@
 package hftorderbook
 
 import (
-	"testing"
 	"math/rand"
+	"testing"
 	//"fmt"
 )
 
@@ -16,7 +16,7 @@ func TestRedBlackEmpty(t *testing.T) {
 func TestRedBlackBasic(t *testing.T) {
 	st := NewRedBlackBST()
 	keys := make([]float64, 0)
-	for i := 0; i < 10; i+=1 {
+	for i := 0; i < 10; i += 1 {
 		k := rand.Float64()
 		keys = append(keys, k)
 		st.Put(k, nil)
@@ -26,10 +26,10 @@ func TestRedBlackBasic(t *testing.T) {
 		t.Errorf("size should equals 10, got %d", st.Size())
 	}
 	if st.IsEmpty() {
-		t.Errorf("st should not be empty")	
+		t.Errorf("st should not be empty")
 	}
 
-	for _, k := range keys { 
+	for _, k := range keys {
 		if !st.Contains(k) {
 			t.Errorf("st should contain the key %0.8f", k)
 		}
@@ -39,7 +39,7 @@ func TestRedBlackBasic(t *testing.T) {
 func TestRedBlackHeight(t *testing.T) {
 	st := NewRedBlackBST()
 	n := 100000
-	for i := 0; i < n; i+=1 {
+	for i := 0; i < n; i += 1 {
 		k := rand.Float64()
 		st.Put(k, nil)
 	}
@@ -48,7 +48,7 @@ func TestRedBlackHeight(t *testing.T) {
 		t.Errorf("size should equals %d, got %d", n, st.Size())
 	}
 	if st.IsEmpty() {
-		t.Errorf("st should not be empty")	
+		t.Errorf("st should not be empty")
 	}
 
 	height := st.Height()
@@ -59,8 +59,8 @@ func TestRedBlackHeight(t *testing.T) {
 
 func TestRedBlackMinMax(t *testing.T) {
 	st := NewRedBlackBST()
-	for i := 0; i < 10; i+=1 {
-		st.Put(float64(10 - i), nil)
+	for i := 0; i < 10; i += 1 {
+		st.Put(float64(10-i), nil)
 	}
 
 	min := 1.0
@@ -76,8 +76,8 @@ func TestRedBlackMinMax(t *testing.T) {
 
 func TestRedBlackMinMaxCachedOnDelete(t *testing.T) {
 	st := NewRedBlackBST()
-	for i := 0; i < 100; i+=1 {
-		st.Put(float64(100 - i), nil)
+	for i := 0; i < 100; i += 1 {
+		st.Put(float64(100-i), nil)
 	}
 
 	min := 1.0
@@ -152,7 +152,7 @@ func TestRedBlackCeiling(t *testing.T) {
 
 func TestRedBlackSelect(t *testing.T) {
 	st := NewRedBlackBST()
-	for i := 0; i < 10; i+=1 {
+	for i := 0; i < 10; i += 1 {
 		k := float64(10 - i)
 		st.Put(k, nil)
 	}
@@ -171,7 +171,7 @@ func TestRedBlackSelect(t *testing.T) {
 func TestRedBlackRank(t *testing.T) {
 	st := NewRedBlackBST()
 	keys := make([]float64, 0)
-	for i := 0; i < 10; i+=1 {
+	for i := 0; i < 10; i += 1 {
 		k := float64(10 - i)
 		keys = append(keys, k)
 		st.Put(k, nil)
@@ -195,7 +195,7 @@ func TestRedBlackRank(t *testing.T) {
 
 func TestRedBlackKeys(t *testing.T) {
 	st := NewRedBlackBST()
-	for i := 0; i < 10; i+=1 {
+	for i := 0; i < 10; i += 1 {
 		k := float64(10 - i)
 		st.Put(k, nil)
 	}
@@ -224,7 +224,7 @@ func TestRedBlackKeys(t *testing.T) {
 
 func TestRedBlackDeleteMin(t *testing.T) {
 	st := NewRedBlackBST()
-	for i := 0; i < 10; i+=1 {
+	for i := 0; i < 10; i += 1 {
 		k := float64(10 - i)
 		st.Put(k, nil)
 	}
@@ -245,7 +245,7 @@ func TestRedBlackDeleteMin(t *testing.T) {
 
 func TestRedBlackDeleteMax(t *testing.T) {
 	st := NewRedBlackBST()
-	for i := 0; i < 10; i+=1 {
+	for i := 0; i < 10; i += 1 {
 		k := float64(i)
 		st.Put(k, nil)
 	}
@@ -266,7 +266,7 @@ func TestRedBlackDeleteMax(t *testing.T) {
 
 func TestRedBlackDelete(t *testing.T) {
 	st := NewRedBlackBST()
-	for i := 0; i < 10; i+=1 {
+	for i := 0; i < 10; i += 1 {
 		k := float64(i)
 		st.Put(k, nil)
 	}
@@ -288,7 +288,7 @@ func TestRedBlackDelete(t *testing.T) {
 
 func TestRedBlackPutLinkedListOrder(t *testing.T) {
 	st := NewRedBlackBST()
-	for i := 0; i < 100; i+=1 {
+	for i := 0; i < 100; i += 1 {
 		k := rand.Float64()
 		st.Put(k, nil)
 	}
@@ -311,7 +311,7 @@ func TestRedBlackPutDeleteLinkedListOrder(t *testing.T) {
 	}
 
 	// deleting from both ends and in the middle 90% of the nodes
-	k := int(float64(n)*0.3)
+	k := int(float64(n) * 0.3)
 	for i := 0; i < k; i += 1 {
 		st.DeleteMin()
 		k := st.Select(rand.Intn(st.Size()))
@@ -340,7 +340,7 @@ func benchmarkRedBlackLimitedRandomInsertWithCaching(n int, b *testing.B) {
 	for i := range limitslist {
 		limitslist[i] = rand.Float64()
 	}
-	
+
 	// preallocate empty orders
 	orders := make([]*Order, 0, b.N)
 	for i := 0; i < b.N; i += 1 {
@@ -375,7 +375,7 @@ func benchmarkRedBlackLimitedRandomInsertWithCaching(n int, b *testing.B) {
 
 			// caching limit
 			limitscache[price] = &l
-			
+
 			// inserting into tree
 			st.Put(l.Price, &l)
 		}

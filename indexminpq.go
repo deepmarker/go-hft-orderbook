@@ -2,17 +2,17 @@ package hftorderbook
 
 // Indexed mininum oriented Priority Queue
 type indexMinPQ struct {
-	keys []float64
+	keys         []float64
 	index2offset []int
 	offset2index []int
-	n int
+	n            int
 }
 
 func NewIndexMinPQ(size int) indexMinPQ {
-	return indexMinPQ {
-		keys: make([]float64, size + 1),
-		index2offset: make([]int, size + 1),
-		offset2index: make([]int, size + 1),
+	return indexMinPQ{
+		keys:         make([]float64, size+1),
+		index2offset: make([]int, size+1),
+		offset2index: make([]int, size+1),
 	}
 }
 
@@ -30,7 +30,7 @@ func (pq *indexMinPQ) Insert(i int, key float64) {
 	if pq.index2offset[i] > 0 {
 		panic("index already used")
 	}
-	if pq.n + 1 == cap(pq.keys) {
+	if pq.n+1 == cap(pq.keys) {
 		panic("pq is full")
 	}
 
@@ -84,7 +84,7 @@ func (pq *indexMinPQ) Delete(i int) {
 	lastkeyindex := pq.offset2index[pq.n]
 	pq.index2offset[lastkeyindex] = offset
 	pq.offset2index[offset] = lastkeyindex
-	
+
 	// nullify removed data
 	pq.offset2index[pq.n] = 0
 	pq.index2offset[i] = 0
@@ -118,11 +118,10 @@ func (pq *indexMinPQ) DelTop() int {
 	return minindex
 }
 
-
 // helpers
 
 func (pq *indexMinPQ) checkIndex(i int) {
-	if i < 0 || i + 1 >= cap(pq.keys) {
+	if i < 0 || i+1 >= cap(pq.keys) {
 		panic("invalid index")
 	}
 }
@@ -139,14 +138,14 @@ func (pq *indexMinPQ) swim(i int) {
 		pq.index2offset[kid], pq.index2offset[k2id] = pq.index2offset[k2id], pq.index2offset[kid]
 		pq.offset2index[k], pq.offset2index[k/2] = pq.offset2index[k/2], pq.offset2index[k]
 
-		k = k/2
+		k = k / 2
 	}
 }
 
 func (pq *indexMinPQ) sink(i int) {
 	k := pq.index2offset[i]
 	for 2*k <= pq.n {
-		c := 2*k
+		c := 2 * k
 
 		// select minimum of two children
 		if c < pq.n && pq.keys[c+1] < pq.keys[c] {

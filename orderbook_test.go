@@ -1,9 +1,9 @@
 package hftorderbook
 
 import (
-	"testing"
 	"math"
 	"math/rand"
+	"testing"
 	//"fmt"
 )
 
@@ -70,11 +70,11 @@ func TestOrderbookAddMultiple(t *testing.T) {
 func TestOrderbookAddAndCancel(t *testing.T) {
 	b := NewOrderbook()
 	bid1 := &Order{
-		Id: 1,
+		Id:       1,
 		BidOrAsk: true,
 	}
 	bid2 := &Order{
-		Id: 2,
+		Id:       2,
 		BidOrAsk: true,
 	}
 	b.Add(1.0, bid1)
@@ -91,18 +91,18 @@ func TestOrderbookAddAndCancel(t *testing.T) {
 func TestGetVolumeAtLimit(t *testing.T) {
 	b := NewOrderbook()
 	bid1 := &Order{
-		Id: 1,
+		Id:       1,
 		BidOrAsk: true,
-		Volume: 0.1,
+		Volume:   0.1,
 	}
 	bid2 := &Order{
-		Id: 2,
+		Id:       2,
 		BidOrAsk: true,
-		Volume: 0.2,
+		Volume:   0.2,
 	}
 	b.Add(1.0, bid1)
 	b.Add(1.0, bid2)
-	if math.Abs(b.GetVolumeAtBidLimit(1.0) - 0.3) > 0.0000001 {
+	if math.Abs(b.GetVolumeAtBidLimit(1.0)-0.3) > 0.0000001 {
 		t.Errorf("invalid volume at limit: %0.8f", b.GetVolumeAtBidLimit(1.0))
 	}
 }
@@ -115,7 +115,7 @@ func benchmarkOrderbookLimitedRandomInsert(n int, b *testing.B) {
 	for i := range limitslist {
 		limitslist[i] = rand.Float64()
 	}
-	
+
 	// preallocate empty orders
 	orders := make([]*Order, 0, b.N)
 	for i := 0; i < b.N; i += 1 {

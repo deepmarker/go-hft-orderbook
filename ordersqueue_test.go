@@ -23,7 +23,7 @@ func TestOrdersQueueEnqueDequeue(t *testing.T) {
 
 	r := q.Dequeue()
 	if q.Size() != 0 || !q.IsEmpty() {
-		t.Errorf("a queue should be empty now")	
+		t.Errorf("a queue should be empty now")
 	}
 	r2 := q.Dequeue()
 	if r2 != nil {
@@ -36,7 +36,7 @@ func TestOrdersQueueEnqueDequeue(t *testing.T) {
 	q.Enqueue(o)
 	q.Dequeue()
 	if q.Size() != 0 || !q.IsEmpty() {
-		t.Errorf("a queue should be empty now")	
+		t.Errorf("a queue should be empty now")
 	}
 }
 
@@ -44,7 +44,7 @@ func TestOrdersQueueMultiple(t *testing.T) {
 	q := NewOrdersQueue()
 	n := 100
 	for i := 0; i < n; i += 1 {
-		q.Enqueue(&Order{ Id: i })
+		q.Enqueue(&Order{Id: i})
 	}
 
 	if q.Size() != n {
@@ -68,11 +68,11 @@ func TestOrdersQueueMixed(t *testing.T) {
 	q := NewOrdersQueue()
 	n := 100
 	for i := 0; i < n; i += 1 {
-		q.Enqueue(&Order{ Id: i })
+		q.Enqueue(&Order{Id: i})
 		q.Dequeue()
 	}
 
 	if q.Size() != 0 || !q.IsEmpty() {
-		t.Errorf("a queue should be empty now")	
+		t.Errorf("a queue should be empty now")
 	}
 }

@@ -1,8 +1,8 @@
 package hftorderbook
 
 import (
-	"testing"
 	"math/rand"
+	"testing"
 	//"fmt"
 )
 
@@ -16,7 +16,7 @@ func TestBSTEmpty(t *testing.T) {
 func TestBSTBasic(t *testing.T) {
 	st := NewBST()
 	keys := make([]float64, 0)
-	for i := 0; i < 10; i+=1 {
+	for i := 0; i < 10; i += 1 {
 		k := rand.Float64()
 		keys = append(keys, k)
 		st.Put(k, nil)
@@ -26,10 +26,10 @@ func TestBSTBasic(t *testing.T) {
 		t.Errorf("size should equals 10, got %d", st.Size())
 	}
 	if st.IsEmpty() {
-		t.Errorf("st should not be empty")	
+		t.Errorf("st should not be empty")
 	}
 
-	for _, k := range keys { 
+	for _, k := range keys {
 		if !st.Contains(k) {
 			t.Errorf("st should contain the key %0.8f", k)
 		}
@@ -39,7 +39,7 @@ func TestBSTBasic(t *testing.T) {
 func TestBSTHeight(t *testing.T) {
 	st := NewBST()
 	n := 100000
-	for i := 0; i < n; i+=1 {
+	for i := 0; i < n; i += 1 {
 		k := rand.Float64()
 		st.Put(k, nil)
 	}
@@ -48,7 +48,7 @@ func TestBSTHeight(t *testing.T) {
 		t.Errorf("size should equals %d, got %d", n, st.Size())
 	}
 	if st.IsEmpty() {
-		t.Errorf("st should not be empty")	
+		t.Errorf("st should not be empty")
 	}
 
 	height := st.Height()
@@ -59,8 +59,8 @@ func TestBSTHeight(t *testing.T) {
 
 func TestBSTMinMax(t *testing.T) {
 	st := NewBST()
-	for i := 0; i < 10; i+=1 {
-		st.Put(float64(10 - i), nil)
+	for i := 0; i < 10; i += 1 {
+		st.Put(float64(10-i), nil)
 	}
 
 	min := 1.0
@@ -76,8 +76,8 @@ func TestBSTMinMax(t *testing.T) {
 
 func TestBSTMinMaxCachedOnDelete(t *testing.T) {
 	st := NewBST()
-	for i := 0; i < 100; i+=1 {
-		st.Put(float64(100 - i), nil)
+	for i := 0; i < 100; i += 1 {
+		st.Put(float64(100-i), nil)
 	}
 
 	min := 1.0
@@ -156,7 +156,7 @@ func TestBSTCeiling(t *testing.T) {
 
 func TestBSTSelect(t *testing.T) {
 	st := NewBST()
-	for i := 0; i < 10; i+=1 {
+	for i := 0; i < 10; i += 1 {
 		k := float64(10 - i)
 		st.Put(k, nil)
 	}
@@ -175,7 +175,7 @@ func TestBSTSelect(t *testing.T) {
 func TestBSTRank(t *testing.T) {
 	st := NewBST()
 	keys := make([]float64, 0)
-	for i := 0; i < 10; i+=1 {
+	for i := 0; i < 10; i += 1 {
 		k := float64(10 - i)
 		keys = append(keys, k)
 		st.Put(k, nil)
@@ -199,7 +199,7 @@ func TestBSTRank(t *testing.T) {
 
 func TestBSTKeys(t *testing.T) {
 	st := NewBST()
-	for i := 0; i < 10; i+=1 {
+	for i := 0; i < 10; i += 1 {
 		k := float64(10 - i)
 		st.Put(k, nil)
 	}
@@ -228,7 +228,7 @@ func TestBSTKeys(t *testing.T) {
 
 func TestBSTDelete(t *testing.T) {
 	st := NewBST()
-	for i := 0; i < 10; i+=1 {
+	for i := 0; i < 10; i += 1 {
 		k := float64(i)
 		st.Put(k, nil)
 	}
@@ -246,7 +246,7 @@ func TestBSTDelete(t *testing.T) {
 
 func TestBSTPutLinkedListOrder(t *testing.T) {
 	st := NewBST()
-	for i := 0; i < 100; i+=1 {
+	for i := 0; i < 100; i += 1 {
 		k := rand.Float64()
 		st.Put(k, nil)
 	}
@@ -269,7 +269,7 @@ func TestBSTPutDeleteLinkedListOrder(t *testing.T) {
 	}
 
 	// deleting random 90% of the nodes
-	k := int(float64(n)*0.9)
+	k := int(float64(n) * 0.9)
 	for i := 0; i < k; i += 1 {
 		k := st.Select(rand.Intn(st.Size()))
 		st.Delete(k)
@@ -296,7 +296,7 @@ func BenchmarkBSTLimitedRandomInsertWithCaching(b *testing.B) {
 	for i := range limitslist {
 		limitslist[i] = rand.Float64()
 	}
-	
+
 	// preallocate empty orders
 	orders := make([]*Order, 0, b.N)
 	for i := 0; i < b.N; i += 1 {
@@ -331,7 +331,7 @@ func BenchmarkBSTLimitedRandomInsertWithCaching(b *testing.B) {
 
 			// caching limit
 			limitscache[price] = &l
-			
+
 			// inserting into tree
 			st.Put(l.Price, &l)
 		}

@@ -1,8 +1,8 @@
 package hftorderbook
 
 import (
-	"testing"
 	"math/rand"
+	"testing"
 	//"fmt"
 )
 
@@ -20,7 +20,7 @@ func TestMinPQTwo(t *testing.T) {
 	minpq := NewMinPQ(10)
 	minpq.Insert(6.0)
 	minpq.Insert(5.0)
-	
+
 	res := [2]float64{}
 	res[0] = minpq.Top()
 	minpq.DelTop()
@@ -37,7 +37,7 @@ func TestMinPQThree(t *testing.T) {
 	minpq.Insert(6.0)
 	minpq.Insert(5.0)
 	minpq.Insert(4.0)
-	
+
 	res := [3]float64{}
 	res[0] = minpq.Top()
 	minpq.DelTop()
@@ -83,8 +83,6 @@ func TestMinPQRandom(t *testing.T) {
 	}
 }
 
-
-
 func benchmarkMinPQLimitedRandomInsertWithCaching(n int, b *testing.B) {
 	pq := NewMinPQ(n)
 
@@ -93,7 +91,7 @@ func benchmarkMinPQLimitedRandomInsertWithCaching(n int, b *testing.B) {
 	for i := range limitslist {
 		limitslist[i] = rand.Float64()
 	}
-	
+
 	// preallocate empty orders
 	orders := make([]*Order, 0, b.N)
 	for i := 0; i < b.N; i += 1 {
@@ -128,7 +126,7 @@ func benchmarkMinPQLimitedRandomInsertWithCaching(n int, b *testing.B) {
 
 			// caching limit
 			limitscache[price] = &l
-			
+
 			// inserting into heap
 			pq.Insert(price)
 		}
